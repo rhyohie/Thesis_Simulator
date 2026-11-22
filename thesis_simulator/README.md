@@ -1,17 +1,13 @@
-# thesis_simulator
+# Thesis Simulator
 
-A new Flutter project.
+Flutter client for the Cacao Pod Model Simulator.
 
-## Getting Started
+Start the Python service in `server/` first, then run:
 
-This project is a starting point for a Flutter application.
+```powershell
+cd thesis_simulator
+flutter pub get
+flutter run -d edge
+```
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+See the repository root [README.md](../README.md) for full setup instructions.

@@ -6,49 +6,72 @@ model**. You can switch between the **modified BN+GAP model** and the **baseline
 optional panel shows how the chosen model processed the photo (the steps differ: only the modified
 model has the averaging step and the "where it looked" map).
 
-Layout: `server/` is the Python service that runs the model. `flutter/` holds the `lib` and
-`test` folders for the Flutter app. The two talk over HTTP (default `http://localhost:8000`).
+Layout: `server/` is the Python service that runs the model. `thesis_simulator/` is the Flutter
+app. The two communicate over HTTP (default `http://localhost:8000`).
 
-## Part 1 — Python service (do this first)
+## Prerequisites
 
-1. Check your Python version: `python --version`. TensorFlow normally needs Python 3.10–3.12.
-2. In a terminal, go into the `server` folder and create an environment:
+- Git
+- Git LFS
+- Python 3.10–3.12
+- Flutter SDK
 
+After cloning, Git LFS downloads both model weights automatically. Do not copy or rename weight
+files; the repository already contains them in the correct folders:
+
+- `server/model/modified/best.weights.h5`
+- `server/model/baseline/final.weights.h5`
+
+The virtual environment, Flutter build output, `.dart_tool/`, and caches are not stored in Git.
+Every user creates these locally.
+
+## Part 1 — Clone and start the Python service
+
+1. Clone the repository:
+
+       git clone https://github.com/rhyohie/Thesis_Simulator.git
+       cd Thesis_Simulator
+       git lfs pull
+
+   If Git LFS is not installed, run `git lfs install` before cloning or pulling.
+
+2. Create and activate a local virtual environment:
+
+       cd server
        python -m venv .venv
        .venv\Scripts\activate
-       pip install -r requirements.txt
+       python -m pip install --upgrade pip
+       python -m pip install -r requirements.txt
 
-3. Put the weights in the model folders. Each folder already has its `config.json`.
-   **One checkpoint per model is enough:**
+3. (Optional) run the tests:
 
-       server\model\modified\best.weights.h5     <- model_weights.h5 (BN+GAP, selected epoch 99)
-       server\model\baseline\final.weights.h5    <- final.weights.h5 from YOUR baseline notebook
-                                                     (final epoch 100, the thesis baseline)
+       pytest
 
-   Copy the files and **rename** them as shown. Your baseline's `final.weights.h5` is 1.58 GB
-   (it also stores the optimizer state); the service loads it as it is. If you prefer a 525 MB
-   file, `make_slim_baseline.ipynb` converts it on Kaggle (optional).
+4. Start the service:
 
-   Optional extras, shown in the app as additional checkpoints only if the files exist:
-   `modified\final.weights.h5` (BN+GAP final epoch 100) and `baseline\best.weights.h5` (the
-   groupmate's baseline trial, selected at epoch 3 while training was diverging).
+       uvicorn app.main:app --host 127.0.0.1 --port 8000
 
-4. (Optional) run the tests, which use the real weights: `pytest`
-5. Start the service: `uvicorn app.main:app --port 8000` (or double-click `run_server.bat`).
-6. Open http://localhost:8000/health in a browser. It should show `{"status":"ok",...}`.
+   On Windows, you can also double-click `server\run_server.bat` after the virtual environment
+   has been created.
 
-Leave this window open while you use the app.
+5. Open http://localhost:8000/health in a browser. It should show `{"status":"ok",...}`.
 
-## Part 2 — Flutter app
+Leave this terminal open while using the app.
 
-1. In your `thesis_simulator` project, **delete the old `lib` and `test` folders**, then copy
-   in the new ones from `flutter/` in this zip.
-2. In the project folder, add the two packages (do not edit pubspec.yaml by hand):
+## Part 2 — Start the Flutter app
 
-       flutter pub add http image_picker
+1. Open a second terminal in the repository root:
 
-3. Run `flutter analyze`, then `flutter test`, then `flutter run -d edge`.
-4. In the app, the chip at the top should say **Server connected**. Choose a photo (Upload) and
+       cd thesis_simulator
+       flutter pub get
+       flutter analyze
+       flutter test
+       flutter run -d edge
+
+2. The existing `lib/` and `test/` folders are already in the repository. Do not delete or copy
+   them.
+
+3. In the app, the chip at the top should say **Server connected**. Choose a photo (Upload) and
    press **Analyze photo**. **Both models answer the same photo at once**, side by side, with a
    line saying whether they agree. Each card shows the prediction, the probability of every class,
    and the recorded **F1 score** of each class (the small "?" next to the F1 header explains it).
