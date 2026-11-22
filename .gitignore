@@ -1,0 +1,18 @@
+# Python
+/server/.venv/
+/server/.pytest_cache/
+__pycache__/
+*.py[cod]
+
+# Flutter/Dart
+/thesis_simulator/.dart_tool/
+/thesis_simulator/build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# Editors and operating systems
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
